@@ -14,12 +14,14 @@ project:
   - us-west-1
   - us-west-2
 tests:
-  cfn-abi-lacework-polygraph:
+  cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping:
     regions:
       - us-east-1  # Control Tower Home region for Pilot
   template: templates/cfn-abi-lacework-polygraph.template.yml
   parameters:
       pSRASourceS3BucketName: $[taskcat_autobucket]
-      pSRASourceS3BucketNamePrefix: $[taskcat_project_name]
       pSRAS3BucketRegion: us-east-1  # Bucket region. Keep it to us-east-1 as all the resources are deployed in the region.
-      # ApiKey: $[taskcat_ssm_/path/to/ssm/parameter] # update `taskcat_ssm_/path/to/ssm/parameter` as needed ^^
+      LaceworkURL: $[taskcat_secretsmanager_laceworkurl]
+      LaceworkAccessKeyID: $[taskcat_secretsmanager_laceworkaccesskeyid]
+      LaceworkSecretKey: $[taskcat_secretsmanager_laceworksecretkey]
+      LaceworkOrgSubAccountNames: $[taskcat_secretsmanager_laceworkorgsubaccountnames]
