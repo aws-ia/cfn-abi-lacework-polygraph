@@ -131,9 +131,7 @@ Resources:
   LaceworkSnsCustomResource:
     Type: Custom::LaceworkSnsCustomResource
     DependsOn:
-      - LaceworkSecHubCrossAccountAccessRole
       - LaceworkSecHubQueuePolicy
-      - LaceworkSecHubQueue
     Properties:
       Type: AWS_SECURITY_HUB
       ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:%awsAcnt:prodn-customer-cloudformation"
