@@ -1,0 +1,733 @@
+########################################################################
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+########################################################################
+AWSTemplateFormatVersion: '2010-09-09'
+Description:
+  Creates the SRA staging S3 bucket to store solution Lambda source code, CloudFormation templates, and other deployment files. -
+  'common_prerequisites' solution in the repo, https://github.com/aws-samples/aws-security-reference-architecture-examples (sra-1ssgnse2h)
+Metadata:
+  SRA:
+    Version: 1.0
+    Order: 3
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: General Properties
+        Parameters:
+          - pSRASolutionTagKey
+          - pSRASolutionName
+          - pAWSControlTowerExecutionRoleName
+          - pOrganizationId
+      - Label:
+          default: AWS Organization ID - Lambda Function Properties
+        Parameters:
+          - pOrgIdLambdaRoleName
+          - pOrgIdLambdaFunctionName
+      - Label:
+          default: Management Account Parameters - Lambda Function Properties
+        Parameters:
+          - pManagementAccountParametersLambdaRoleName
+          - pManagementAccountParametersLambdaFunctionName
+      - Label:
+          default: General Lambda Function Properties
+        Parameters:
+          - pCreateLambdaLogGroup
+          - pLambdaLogGroupRetention
+          - pLambdaLogGroupKmsKey
+          - pLambdaLogLevel
+      - Label:
+          default: Source location details
+        Parameters:
+          - pSRASourceS3BucketName
+          - pSRASourceS3BucketNamePrefix
+          - pSRAStagingS3KeyPrefix
+    ParameterLabels:
+      pAWSControlTowerExecutionRoleName:
+        default: Control Tower Execution Role Name
+      pCreateLambdaLogGroup:
+        default: Create Lambda Log Group
+      pLambdaLogGroupKmsKey:
+        default: (Optional) Lambda Logs KMS Key
+      pLambdaLogGroupRetention:
+        default: Lambda Log Group Retention
+      pLambdaLogLevel:
+        default: Lambda Log Level
+      pOrgIdLambdaFunctionName:
+        default: AWS Organization ID - Lambda Function Name
+      pOrgIdLambdaRoleName:
+        default: AWS Organization ID - Lambda Role Name
+      pManagementAccountParametersLambdaFunctionName:
+        default: Management Account Parameters - Lambda Function Name
+      pManagementAccountParametersLambdaRoleName:
+        default: Management Account Parameters - Lambda Role Name
+      pOrganizationId:
+        default: (Optional) AWS Organization ID
+      pSRASolutionName:
+        default: SRA Solution Name
+      pSRASolutionTagKey:
+        default: SRA Solution Tag Key
+      pSRASourceS3BucketName:
+        default: S3 Bucket location where the lambda packages are available
+      pSRASourceS3BucketNamePrefix:
+        default: SRA Staging S3 Bucket Name Prefix
+      pSRAStagingS3KeyPrefix:
+        default: S3 Key Name - usually the project name
+Parameters:
+  pAWSControlTowerExecutionRoleName:
+    AllowedValues: [AWSControlTowerExecution]
+    Default: AWSControlTowerExecution
+    Description: The AWS Control Tower Execution IAM Role used to deploy resources within accounts
+    Type: String
+  pCreateLambdaLogGroup:
+    AllowedValues: ['true', 'false']
+    Default: 'false'
+    Description:
+      Indicates whether a CloudWatch Log Group should be explicitly created for the Lambda function, to allow for setting a Log Retention and/or KMS
+      Key for encryption.
+    Type: String
+  pLambdaLogGroupKmsKey:
+    AllowedPattern: '^$|^arn:(aws[a-zA-Z-]*){1}:kms:[a-z0-9-]+:\d{12}:key\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'
+    ConstraintDescription: 'Key ARN example:  arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab'
+    Default: ''
+    Description:
+      (Optional) KMS Key ARN to use for encrypting the Lambda logs data. If empty, encryption is enabled with CloudWatch Logs managing the server-side
+      encryption keys.
+    Type: String
+  pLambdaLogGroupRetention:
+    AllowedValues: [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653]
+    Default: 14
+    Description: Specifies the number of days you want to retain log events
+    Type: String
+  pLambdaLogLevel:
+    AllowedValues: [INFO, ERROR, DEBUG]
+    Default: INFO
+    Description: Lambda Function Logging Level
+    Type: String
+  pOrgIdLambdaFunctionName:
+    AllowedPattern: '^[\w-]{1,64}$'
+    ConstraintDescription: Max 64 alphanumeric characters. Also special characters supported [_, -]
+    Default: sra-sh-org-id
+    Description: Lambda function name for getting the AWS Organization ID
+    Type: String
+  pOrgIdLambdaRoleName:
+    AllowedPattern: '^[\w+=,.@-]{1,64}$'
+    ConstraintDescription: Max 64 alphanumeric characters. Also special characters supported [+, =, ., @, -].
+    Default: sra-sh-org-id-lambda
+    Description: Lambda execution role for getting the AWS Organization ID
+    Type: String
+  pOrganizationId:
+    AllowedPattern: '^$|^o-[a-z0-9]{10,32}$'
+    ConstraintDescription: Must start with 'o-' followed by from 10 to 32 lowercase letters or digits. (e.g. o-abc1234567)
+    Default: ''
+    Description: (Optional) AWS Organizations ID. If empty, custom resource will be deployed to determine the AWS Organization ID.
+    Type: String
+  pManagementAccountParametersLambdaFunctionName:
+    AllowedPattern: '^[\w-]{1,64}$'
+    ConstraintDescription: Max 64 alphanumeric characters. Also special characters supported [_, -]
+    Default: sra-sh-management-account-parameters
+    Description: Lambda function name for creating Control Tower account SSM parameters.
+    Type: String
+  pManagementAccountParametersLambdaRoleName:
+    AllowedPattern: '^[\w+=,.@-]{1,64}$'
+    ConstraintDescription: Max 64 alphanumeric characters. Also special characters supported [+, =, ., @, -].
+    Default: sra-sh-management-account-parameters-lambda
+    Description: Lambda execution role for creating Control Tower account SSM parameters.
+    Type: String
+  pSRASolutionName:
+    AllowedValues: [sra-sh-prerequisites]
+    Default: sra-sh-prerequisites
+    Description: The SRA solution name. The default value is the folder name of the solution
+    Type: String
+  pSRASolutionTagKey:
+    AllowedValues: [sra-solution]
+    Default: sra-solution
+    Description: The SRA solution tag key applied to all resources created by the solution that support tagging. The value is the pSRASolutionName.
+    Type: String
+  pSRASourceS3BucketNamePrefix:
+    AllowedValues: [sra-sh-staging]
+    Default: sra-sh-staging
+    Description:
+      SRA Staging S3 bucket name prefix for the SRA artifacts relevant to the solutions. (e.g., lambda zips, CloudFormation templates). The account
+      and region are added to the prefix <bucket-name-prefix>-<account-id>-<region>. Example = sra-staging-123456789012-us-east-1.
+    Type: String
+  pSRASourceS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    Type: String
+    Default: aws-abi-pilot
+  pSRAStagingS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    Type: String
+    Default: cfn-abi-aws-securityhub
+Conditions:
+  cCreateCustomResource: !Equals [!Ref pOrganizationId, '']
+  cUseKmsKey: !Not [!Equals [!Ref pLambdaLogGroupKmsKey, '']]
+  cCreateLambdaLogGroup: !Equals [!Ref pCreateLambdaLogGroup, 'true']
+  cUseSRAStagingS3BucketNameSSMParameter: !Equals [!Ref pSRASourceS3BucketName, '']
+  cCreateLambdaLogGroupAndCreateCustomResource: !And
+    - !Condition cCreateCustomResource
+    - !Condition cCreateLambdaLogGroup
+  cUsingKmsKey: !Not [!Equals [!Ref pLambdaLogGroupKmsKey, '']]
+  cUseGraviton: !Or
+    - !Equals [!Ref 'AWS::Region', ap-northeast-1]
+    - !Equals [!Ref 'AWS::Region', ap-south-1]
+    - !Equals [!Ref 'AWS::Region', ap-southeast-1]
+    - !Equals [!Ref 'AWS::Region', ap-southeast-2]
+    - !Equals [!Ref 'AWS::Region', eu-central-1]
+    - !Equals [!Ref 'AWS::Region', eu-west-1]
+    - !Equals [!Ref 'AWS::Region', eu-west-2]
+    - !Equals [!Ref 'AWS::Region', us-east-1]
+    - !Equals [!Ref 'AWS::Region', us-east-2]
+    - !Equals [!Ref 'AWS::Region', us-west-2]
+
+Resources:
+  rOrgIdLambdaCustomResource:
+    Condition: cCreateCustomResource
+    Type: Custom::LambdaCustomResource
+    Version: '1.0'
+    Properties:
+      ServiceToken: !GetAtt rOrgIdLambdaFunction.Arn
+
+  rOrgIdLambdaFunction:
+    Condition: cCreateCustomResource
+    DependsOn: rCopyZips
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W58
+            reason: Lambda role provides access to CloudWatch Logs
+          - id: W89
+            reason: Lambda does not need to communicate with VPC resources.
+          - id: W92
+            reason: Lambda does not need reserved concurrent executions.
+      checkov:
+        skip:
+          - id: CKV_AWS_115
+            comment: Lambda does not need reserved concurrent executions.
+          - id: CKV_AWS_116
+            comment: DLQ not needed, as Lambda function only triggered by CloudFormation events.
+          - id: CKV_AWS_117
+            comment: Lambda does not need to communicate with VPC resources.
+          - id: CKV_AWS_173
+            comment: Environment variables are not sensitive.
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref pOrgIdLambdaFunctionName
+      Description: Get AWS Organization ID
+      Architectures: !If
+        - cUseGraviton
+        - [arm64]
+        - !Ref AWS::NoValue
+      Handler: organizations.lambda_handler
+      Role: !GetAtt rOrgIdLambdaRole.Arn
+      Runtime: python3.9
+      Timeout: 60
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref pLambdaLogLevel
+      Tags:
+        - Key: !Ref pSRASolutionTagKey
+          Value: !Ref pSRASolutionName
+      Code:
+        S3Bucket: !Ref rSRAStagingS3Bucket
+        S3Key: !Sub ${pSRAStagingS3KeyPrefix}/lambda_functions/packages/${pSRASolutionName}/lambda.zip
+
+  rOrgIdLambdaLogGroup:
+    Condition: cCreateLambdaLogGroupAndCreateCustomResource
+    DeletionPolicy: Retain
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${pOrgIdLambdaFunctionName}
+      KmsKeyId: !If
+        - cUsingKmsKey
+        - !Ref pLambdaLogGroupKmsKey
+        - !Ref AWS::NoValue
+      RetentionInDays: !Ref pLambdaLogGroupRetention
+
+  rOrgIdLambdaRole:
+    Condition: cCreateCustomResource
+    Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: Allow * in resource when required
+          - id: W28
+            reason: The role name is defined to identify automation resources
+    Properties:
+      RoleName: !Ref pOrgIdLambdaRoleName
+      Description: !Sub Role for '${pOrgIdLambdaRoleName}' Lambda function
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Tags:
+        - Key: !Ref pSRASolutionTagKey
+          Value: !Ref pSRASolutionName
+      Policies:
+        - PolicyName: org-id
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: OrganizationRead
+                Effect: Allow
+                Action: organizations:DescribeOrganization
+                Resource: '*'
+        - PolicyName: CloudWatchLogGroup
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: CloudWatchLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${pOrgIdLambdaFunctionName}:log-stream:*
+
+  rSRAStagingS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35
+            reason: S3 access logs intentionally not enabled
+      checkov:
+        skip:
+          - id: CKV_AWS_18
+            comment: S3 access logs intentionally not enabled
+    Properties:
+      BucketName: !Sub ${pSRASourceS3BucketNamePrefix}-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      Tags:
+        - Key: !Ref pSRASolutionTagKey
+          Value: !Ref pSRASolutionName
+      VersioningConfiguration:
+        Status: Enabled
+
+  rSRAStagingS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F16
+            reason: GetObject is restricted to AWS accounts within the AWS Organization
+    Properties:
+      Bucket: !Ref rSRAStagingS3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowDeploymentRoleGetObject
+            Effect: Allow
+            Action: s3:GetObject
+            Principal: '*'
+            Resource: !Sub arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}/*
+            Condition:
+              ArnLike:
+                aws:PrincipalArn:
+                  - !Sub arn:${AWS::Partition}:iam::*:role/${pAWSControlTowerExecutionRoleName}
+                  - !Sub arn:${AWS::Partition}:iam::*:role/stacksets-exec-*
+
+          - Sid: DenyExternalPrincipals
+            Effect: Deny
+            Action: 's3:*'
+            Principal: '*'
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}
+              - !Sub arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}/*
+            Condition:
+              StringNotEquals:
+                aws:PrincipalOrgID: !If
+                  - cCreateCustomResource
+                  - !GetAtt rOrgIdLambdaCustomResource.OrganizationId
+                  - !Ref pOrganizationId
+
+          - Sid: SecureTransport
+            Effect: Deny
+            Action: 's3:*'
+            Principal: '*'
+            Resource:
+              - !Sub arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}
+              - !Sub arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: False
+
+  rSSMParameterSRAStagingS3BucketName:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /sra/sh/staging-s3-bucket-name
+      Type: String
+      Value: !Ref rSRAStagingS3Bucket
+      Description: SRA Staging S3 Bucket Name SSM parameter
+      Tags:
+        sra-solution: !Ref pSRASolutionName
+
+  rSSMParameterSRAStagingS3BucketNamePrefix:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /sra/sh/staging-s3-bucket-name-prefix
+      Type: String
+      Value: !Ref pSRASourceS3BucketNamePrefix
+      Description: SRA Staging S3 Bucket Name Prefix SSM parameter
+      Tags:
+        sra-solution: !Ref pSRASolutionName
+
+  rCopyZips:
+    Type: Custom::CopyZips
+    Properties:
+      ServiceToken: !GetAtt 'rCopyZipsFunction.Arn'
+      SourceBucket: !Ref 'pSRASourceS3BucketName'
+      DestBucket: !Ref 'rSRAStagingS3Bucket'
+      Prefix: !Sub ${pSRAStagingS3KeyPrefix}/
+      Objects:
+        - lambda_functions/packages/sra-securityhub-org/lambda.zip
+        - lambda_functions/packages/sra-sh-prerequisites/lambda.zip
+        - templates/sra-securityhub-org/sra-securityhub-org-configuration-role.yaml
+        - templates/sra-securityhub-org/sra-securityhub-org-configuration.yaml
+        - templates/sra-securityhub-org/sra-securityhub-org-global-events.yaml
+        - templates/sra-securityhub-org/sra-securityhub-org-main-ssm.yaml
+        - templates/sra-securityhub-org/sra-securityhub-org-main.yaml
+
+  rCopyZipsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: lambda-copier
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectTagging
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pSRASourceS3BucketName}/'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pSRASourceS3BucketName}/${pSRAStagingS3KeyPrefix}/*'
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:PutObjectTagging
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}/'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${rSRAStagingS3Bucket}/${pSRAStagingS3KeyPrefix}/*'
+              - Effect: Allow
+                Action:
+                  - s3:ListAllMyBuckets
+                Resource: '*'
+
+  rCopyZipsFunction:
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W58
+            reason: Lambda role provides access to CloudWatch Logs
+          - id: W89
+            reason: Lambda does not need to communicate with VPC resources.
+          - id: W92
+            reason: Lambda does not need reserved concurrent executions.
+      checkov:
+        skip:
+          - id: CKV_AWS_115
+            comment: Lambda does not need reserved concurrent executions.
+          - id: CKV_AWS_116
+            comment: DLQ not needed, as Lambda function only triggered by CloudFormation events.
+          - id: CKV_AWS_117
+            comment: Lambda does not need to communicate with VPC resources.
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Copies objects from a source S3 bucket to a destination
+      Handler: index.handler
+      Runtime: python3.9
+      MemorySize: 128
+      Role: !GetAtt 'rCopyZipsRole.Arn'
+      Timeout: 240
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import threading
+          import boto3
+          import cfnresponse
+          def copy_objects(source_bucket, dest_bucket, prefix, objects):
+              s3 = boto3.client('s3')
+              for o in objects:
+                  key = prefix + o
+                  copy_source = {
+                      'Bucket': source_bucket,
+                      'Key': key
+                  }
+                  print(('copy_source: %s' % copy_source))
+                  print(('dest_bucket = %s'%dest_bucket))
+                  print(('key = %s' %key))
+                  s3.copy_object(CopySource=copy_source, Bucket=dest_bucket,
+                      Key=key)
+          def bucket_exists():
+              s3 = boto3.client('s3')
+              buckets = s3.list_buckets()
+              for bucket in buckets['Buckets']:
+                  return True
+          def delete_objects(bucket, prefix, objects):
+              s3 = boto3.client('s3')
+              if bucket_exists():
+                  objects = {'Objects': [{'Key': prefix + o} for o in objects]}
+                  s3.delete_objects(Bucket=bucket, Delete=objects)
+          def timeout(event, context):
+              logging.error('Execution is about to time out, sending failure response to CloudFormation')
+              cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
+          def handler(event, context):
+              # make sure we send a failure to CloudFormation if the function
+              # is going to timeout
+              timer = threading.Timer((context.get_remaining_time_in_millis()
+                      / 1000.00) - 0.5, timeout, args=[event, context])
+              timer.start()
+              print(('Received event: %s' % json.dumps(event)))
+              status = cfnresponse.SUCCESS
+              try:
+                  source_bucket = event['ResourceProperties']['SourceBucket']
+                  dest_bucket = event['ResourceProperties']['DestBucket']
+                  prefix = event['ResourceProperties']['Prefix']
+                  objects = event['ResourceProperties']['Objects']
+                  if event['RequestType'] == 'Delete':
+                      delete_objects(dest_bucket, prefix, objects)
+                  else:
+                      copy_objects(source_bucket, dest_bucket, prefix, objects)
+              except Exception as e:
+                  logging.error('Exception: %s' % e, exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  timer.cancel()
+                  cfnresponse.send(event, context, status, {}, None)
+
+  rManagementAccountParametersLambdaCustomResource:
+    Type: Custom::LambdaCustomResource
+    Version: '1.0'
+    Properties:
+      ServiceToken: !GetAtt rManagementAccountParametersLambdaFunction.Arn
+      TAG_KEY: !Ref pSRASolutionTagKey
+      TAG_VALUE: !Ref pSRASolutionName
+
+  rManagementAccountParametersLambdaFunction:
+    DependsOn: rCopyZips
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W58
+            reason: Lambda role provides access to CloudWatch Logs
+          - id: W89
+            reason: Lambda does not need to communicate with VPC resources.
+          - id: W92
+            reason: Lambda does not need reserved concurrent executions.
+      checkov:
+        skip:
+          - id: CKV_AWS_115
+            comment: Lambda does not need reserved concurrent executions.
+          - id: CKV_AWS_116
+            comment: DLQ not needed, as Lambda function only triggered by CloudFormation events.
+          - id: CKV_AWS_117
+            comment: Lambda does not need to communicate with VPC resources.
+          - id: CKV_AWS_173
+            comment: Environment variables are not sensitive
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref pManagementAccountParametersLambdaFunctionName
+      Description: Creates Control Tower account SSM Parameters in the Management Account
+      Architectures: !If
+        - cUseGraviton
+        - [arm64]
+        - !Ref AWS::NoValue
+      Handler: app.lambda_handler
+      Role: !GetAtt rManagementAccountParametersLambdaRole.Arn
+      Runtime: python3.9
+      Timeout: 300
+      Code:
+        S3Bucket: !Ref rSRAStagingS3Bucket
+        S3Key: !Sub ${pSRAStagingS3KeyPrefix}/lambda_functions/packages/${pSRASolutionName}/lambda.zip
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref pLambdaLogLevel
+      Tags:
+        - Key: !Ref pSRASolutionTagKey
+          Value: !Ref pSRASolutionName
+
+  rManagementAccountParametersLambdaLogGroup:
+    Condition: cCreateLambdaLogGroup
+    DeletionPolicy: Retain
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${pManagementAccountParametersLambdaFunctionName}
+      KmsKeyId: !If
+        - cUseKmsKey
+        - !Ref pLambdaLogGroupKmsKey
+        - !Ref AWS::NoValue
+      RetentionInDays: !Ref pLambdaLogGroupRetention
+
+  rManagementAccountParametersLambdaRole:
+    Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: Allow * in resource when required
+          - id: W28
+            reason: The role name is defined to identify automation resources
+    Properties:
+      RoleName: !Ref pManagementAccountParametersLambdaRoleName
+      Description: !Sub Role for '${pManagementAccountParametersLambdaRoleName}' Lambda function
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Tags:
+        - Key: !Ref pSRASolutionTagKey
+          Value: !Ref pSRASolutionName
+      Policies:
+        - PolicyName: ssm-account-parameter-creator
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: STSOrganizationRead
+                Effect: Allow
+                Action:
+                  - organizations:DescribeOrganization
+                  - organizations:ListAccounts
+                  - organizations:ListRoots
+                Resource: '*'
+              - Sid: CloudFormationRead
+                Effect: Allow
+                Action:
+                  - cloudformation:DescribeStackSet
+                  - cloudformation:ListStackInstances
+                Resource: '*'
+              - Sid: SSMParameterRead
+                Effect: Allow
+                Action: ssm:DescribeParameters
+                Resource: '*'
+              - Sid: SSMParameterReadValues
+                Effect: Allow
+                Action: ssm:GetParameters
+                Resource: !Sub arn:${AWS::Partition}:ssm:*:${AWS::AccountId}:parameter/sra/*
+              - Sid: SSMParameterWrite
+                Effect: Allow
+                Action:
+                  - ssm:AddTagsToResource
+                  - ssm:DeleteParameters
+                  - ssm:PutParameter
+                Resource: !Sub arn:${AWS::Partition}:ssm:*:${AWS::AccountId}:parameter/sra/*
+              - Sid: TagsRead
+                Effect: Allow
+                Action: tag:GetResources
+                Resource: '*'
+        - PolicyName: CloudWatchLogGroup
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: CloudWatchLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${pManagementAccountParametersLambdaFunctionName}:log-stream:*
+
+Outputs:
+  oOrganizationId:
+    Condition: cCreateCustomResource
+    Description: Organization ID
+    Value: !GetAtt rOrgIdLambdaCustomResource.OrganizationId
+  oOrgIdLambdaFunctionArn:
+    Condition: cCreateCustomResource
+    Description: AWS Organization ID Lambda Function ARN
+    Value: !GetAtt rOrgIdLambdaFunction.Arn
+  oOrgIdLambdaLogGroupArn:
+    Condition: cCreateLambdaLogGroupAndCreateCustomResource
+    Description: AWS Organization ID Lambda Log Group ARN
+    Value: !GetAtt rOrgIdLambdaLogGroup.Arn
+  oOrgIdLambdaRoleArn:
+    Condition: cCreateCustomResource
+    Description: AWS Organization ID Lambda Role ARN
+    Value: !GetAtt rOrgIdLambdaRole.Arn
+  oSRAStagingS3BucketName:
+    Description: SRA Staging S3 Bucket Name SSM parameter
+    Value: !GetAtt rSSMParameterSRAStagingS3BucketName.Value
+  oSRAStagingS3BucketNamePrefix:
+    Description: SRA Staging S3 Bucket Name Prefix SSM parameter
+    Value: !GetAtt rSSMParameterSRAStagingS3BucketNamePrefix.Value
+  oAuditAccountId:
+    Description: Audit Account ID
+    Value: !GetAtt rManagementAccountParametersLambdaCustomResource.AuditAccountId
+  oCustomerControlTowerRegions:
+    Description: Customer Control Tower Regions
+    Value: !Join [',', !GetAtt rManagementAccountParametersLambdaCustomResource.CustomerControlTowerRegions]
+  oCustomerControlTowerRegionsWithoutHomeRegion:
+    Description: Customer Control Tower Regions without Home Region
+    Value: !Join [',', !GetAtt rManagementAccountParametersLambdaCustomResource.CustomerControlTowerRegionsWithoutHomeRegion]
+  oEnabledRegions:
+    Description: Enabled Regions
+    Value: !Join [',', !GetAtt rManagementAccountParametersLambdaCustomResource.EnabledRegions]
+  oEnabledRegionsWithoutHomeRegion:
+    Description: Enabled Regions without Home Region
+    Value: !Join [',', !GetAtt rManagementAccountParametersLambdaCustomResource.EnabledRegionsWithoutHomeRegion]
+  oHomeRegion:
+    Description: Control Tower Home Region
+    Value: !GetAtt rManagementAccountParametersLambdaCustomResource.HomeRegion
+  oLogArchiveAccountId:
+    Description: Log Archive Account ID
+    Value: !GetAtt rManagementAccountParametersLambdaCustomResource.LogArchiveAccountId
+  oManagementAccountId:
+    Description: Management Account ID
+    Value: !GetAtt rManagementAccountParametersLambdaCustomResource.ManagementAccountId
+  oRootOrganizationalUnitId:
+    Description: Root Organizational Unit ID
+    Value: !GetAtt rManagementAccountParametersLambdaCustomResource.RootOrganizationalUnitId
+  oManagementAccountParametersLambdaFunctionArn:
+    Description: Management Account Parameters Lambda Function ARN
+    Value: !GetAtt rManagementAccountParametersLambdaFunction.Arn
+  oManagementAccountParametersLambdaLogGroupArn:
+    Condition: cCreateLambdaLogGroup
+    Description: Management Account Parameters Lambda Log Group ARN
+    Value: !GetAtt rManagementAccountParametersLambdaLogGroup.Arn
+  oManagementAccountParametersLambdaRoleArn:
+    Description: Management Account Parameters Lambda Role ARN
+    Value: !GetAtt rManagementAccountParametersLambdaRole.Arn
+  oLambdaZipsPackagePath:
+    Description: Local S3 location for Lambda packages
+    Value: !Sub '${pSRASourceS3BucketName}/${pSRAStagingS3KeyPrefix}/lambda_functions/packages/'

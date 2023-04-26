@@ -1,0 +1,221 @@
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping-c848ca33862f4d9184b3773e652c064a
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [CfnAbiAmazonGuardDuty,
+LaceworkSetupFunction, LaceworkControlTowerCfn, CfnAbiAwsSecurityHub].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                                                                                                        ResourceStatusReason
+--------------------------------  ------------------  --------------------------  -----------------------------------------------------------------------------------------------------------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2023-04-26 04:14:15.136000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping-c848ca33862f4d9184b3773e652c064a  The following resource(s) failed to create: [CfnAbiAmazonGuardDuty, LaceworkSetupFunction, LaceworkControlTowerCfn, CfnAbiAwsSecurityHub].
+2023-04-26 04:14:14.403000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  CfnAbiAwsSecurityHub                                                                                                     Embedded stack arn:aws:cloudformation:us-west-2:510534436463:stack/tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1S2UPNCR1SV20/4fd37790-e3e8-11ed-a5fd-06b4ae7dc1b3 was not successfully created: The following resource(s) failed to create: [rSecurityHubEnableInOrg].
+2023-04-26 04:11:03.210000+00:00  CREATE_FAILED       AWS::Lambda::Function       LaceworkSetupFunction                                                                                                    Secrets Manager can't find the specified secret. (Service: AWSSecretsManager; Status Code: 400; Error Code: ResourceNotFoundException; Request ID: c8f6e52a-e91f-4749-8027-160f97e5270d; Proxy: null)
+2023-04-26 04:11:02.471000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function       LaceworkSetupFunction
+2023-04-26 04:10:59.014000+00:00  CREATE_COMPLETE     AWS::IAM::Role              LaceworkSetupFunctionRole
+2023-04-26 04:10:44.213000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  LaceworkControlTowerCfn                                                                                                  S3 error: Access Denied
+                                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+2023-04-26 04:10:43.943000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  CfnAbiAmazonGuardDuty                                                                                                    S3 error: Access Denied
+                                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+2023-04-26 04:10:43.520000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              LaceworkSetupFunctionRole                                                                                                Resource creation Initiated
+2023-04-26 04:10:43.469000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  CfnAbiAwsSecurityHub                                                                                                     Resource creation Initiated
+2023-04-26 04:10:43.108000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              LaceworkSetupFunctionRole
+2023-04-26 04:10:42.786000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  LaceworkControlTowerCfn
+2023-04-26 04:10:42.635000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  CfnAbiAmazonGuardDuty
+2023-04-26 04:10:42.541000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  CfnAbiAwsSecurityHub
+2023-04-26 04:10:37.393000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping-c848ca33862f4d9184b3773e652c064a  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:14PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1S2UPNCR1SV20
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [rSecurityHubEnableInOrg].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                                                                                    ResourceStatusReason
+--------------------------------  ------------------  --------------------------  ---------------------------------------------------------------------------------------------------  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2023-04-26 04:14:07.793000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1S2UPNCR1SV20  The following resource(s) failed to create: [rSecurityHubEnableInOrg].
+2023-04-26 04:14:07.250000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  rSecurityHubEnableInOrg                                                                              Embedded stack arn:aws:cloudformation:us-west-2:510534436463:stack/tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV/c3033ac0-e3e8-11ed-a246-0afb94230379 was not successfully created: The following resource(s) failed to create: [rSecurityHubConfigurationIAMRoleStack, rSecurityHubConfigurationIAMRoleStackSet].
+2023-04-26 04:13:56.833000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  rSecurityHubEnableInOrg                                                                              Resource creation Initiated
+2023-04-26 04:13:55.810000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  rSecurityHubEnableInOrg
+2023-04-26 04:13:52.909000+00:00  CREATE_COMPLETE     AWS::CloudFormation::Stack  rSecurityHubStageLocal
+2023-04-26 04:10:49.333000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  rSecurityHubStageLocal                                                                               Resource creation Initiated
+2023-04-26 04:10:47.910000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  rSecurityHubStageLocal
+2023-04-26 04:10:43.334000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1S2UPNCR1SV20  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:14PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-8IYME34I9UON
+*****************************************************************************
+ResourceStatusReason:  
+Stack launch was successful
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                  LogicalResourceId                                                                                    ResourceStatusReason
+--------------------------------  ------------------  ----------------------------  ---------------------------------------------------------------------------------------------------  ---------------------------
+2023-04-26 04:13:40.972000+00:00  CREATE_COMPLETE     AWS::CloudFormation::Stack    tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-8IYME34I9UON
+2023-04-26 04:13:37.995000+00:00  CREATE_COMPLETE     Custom::LambdaCustomResource  rManagementAccountParametersLambdaCustomResource
+2023-04-26 04:13:37.753000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rManagementAccountParametersLambdaCustomResource                                                     Resource creation Initiated
+2023-04-26 04:12:24.846000+00:00  CREATE_COMPLETE     AWS::S3::BucketPolicy         rSRAStagingS3BucketPolicy
+2023-04-26 04:12:24.719000+00:00  CREATE_IN_PROGRESS  AWS::S3::BucketPolicy         rSRAStagingS3BucketPolicy                                                                            Resource creation Initiated
+2023-04-26 04:12:23.899000+00:00  CREATE_IN_PROGRESS  AWS::S3::BucketPolicy         rSRAStagingS3BucketPolicy
+2023-04-26 04:12:20.399000+00:00  CREATE_COMPLETE     Custom::LambdaCustomResource  rOrgIdLambdaCustomResource
+2023-04-26 04:12:20.132000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rOrgIdLambdaCustomResource                                                                           Resource creation Initiated
+2023-04-26 04:12:16.397000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rManagementAccountParametersLambdaCustomResource
+2023-04-26 04:12:15.778000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rOrgIdLambdaCustomResource
+2023-04-26 04:12:13.634000+00:00  CREATE_COMPLETE     AWS::Lambda::Function         rManagementAccountParametersLambdaFunction
+2023-04-26 04:12:13.134000+00:00  CREATE_COMPLETE     AWS::Lambda::Function         rOrgIdLambdaFunction
+2023-04-26 04:12:06.368000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rManagementAccountParametersLambdaFunction                                                           Resource creation Initiated
+2023-04-26 04:12:05.850000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rOrgIdLambdaFunction                                                                                 Resource creation Initiated
+2023-04-26 04:12:05.134000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rManagementAccountParametersLambdaFunction
+2023-04-26 04:12:04.660000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rOrgIdLambdaFunction
+2023-04-26 04:12:00.917000+00:00  CREATE_COMPLETE     Custom::CopyZips              rCopyZips
+2023-04-26 04:12:00.669000+00:00  CREATE_IN_PROGRESS  Custom::CopyZips              rCopyZips                                                                                            Resource creation Initiated
+2023-04-26 04:11:53.297000+00:00  CREATE_IN_PROGRESS  Custom::CopyZips              rCopyZips
+2023-04-26 04:11:49.596000+00:00  CREATE_COMPLETE     AWS::Lambda::Function         rCopyZipsFunction
+2023-04-26 04:11:44.033000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rCopyZipsFunction                                                                                    Resource creation Initiated
+2023-04-26 04:11:42.880000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rCopyZipsFunction
+2023-04-26 04:11:38.374000+00:00  CREATE_COMPLETE     AWS::IAM::Role                rCopyZipsRole
+2023-04-26 04:11:23.762000+00:00  CREATE_COMPLETE     AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketName
+2023-04-26 04:11:23.086000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketName                                                                  Resource creation Initiated
+2023-04-26 04:11:22.830000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rCopyZipsRole                                                                                        Resource creation Initiated
+2023-04-26 04:11:22.467000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rCopyZipsRole
+2023-04-26 04:11:21.575000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketName
+2023-04-26 04:11:19.283000+00:00  CREATE_COMPLETE     AWS::S3::Bucket               rSRAStagingS3Bucket
+2023-04-26 04:11:13.116000+00:00  CREATE_COMPLETE     AWS::IAM::Role                rOrgIdLambdaRole
+2023-04-26 04:11:13.014000+00:00  CREATE_COMPLETE     AWS::IAM::Role                rManagementAccountParametersLambdaRole
+2023-04-26 04:10:57.551000+00:00  CREATE_IN_PROGRESS  AWS::S3::Bucket               rSRAStagingS3Bucket                                                                                  Resource creation Initiated
+2023-04-26 04:10:57.265000+00:00  CREATE_COMPLETE     AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:10:57.110000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rOrgIdLambdaRole                                                                                     Resource creation Initiated
+2023-04-26 04:10:56.997000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rManagementAccountParametersLambdaRole                                                               Resource creation Initiated
+2023-04-26 04:10:56.706000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketNamePrefix                                                            Resource creation Initiated
+2023-04-26 04:10:56.416000+00:00  CREATE_IN_PROGRESS  AWS::S3::Bucket               rSRAStagingS3Bucket
+2023-04-26 04:10:56.338000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rOrgIdLambdaRole
+2023-04-26 04:10:56.015000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rManagementAccountParametersLambdaRole
+2023-04-26 04:10:55.306000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:10:49.059000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack    tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-8IYME34I9UON  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:14PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [rSecurityHubConfigurationIAMRoleStack,
+rSecurityHubConfigurationIAMRoleStackSet].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                   LogicalResourceId                                                                                     ResourceStatusReason
+--------------------------------  ------------------  -----------------------------  ----------------------------------------------------------------------------------------------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2023-04-26 04:14:03.992000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack     tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV  The following resource(s) failed to create: [rSecurityHubConfigurationIAMRoleStack, rSecurityHubConfigurationIAMRoleStackSet].
+2023-04-26 04:14:03.439000+00:00  CREATE_FAILED       AWS::CloudFormation::StackSet  rSecurityHubConfigurationIAMRoleStackSet                                                              Resource handler returned message: "S3 error: The bucket you are attempting to access must be addressed using the specified endpoint. Please send all future requests to this endpoint.
+                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html (Service: CloudFormation, Status Code: 400, Request ID: 784d7941-fa06-431b-8404-3cdd588350eb)" (RequestToken: 71d1260a-bf0a-d49c-6af5-c8601323f898, HandlerErrorCode: GeneralServiceException)
+2023-04-26 04:14:02.138000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack     rSecurityHubConfigurationIAMRoleStack                                                                 S3 error: The bucket you are attempting to access must be addressed using the specified endpoint. Please send all future requests to this endpoint.
+                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+2023-04-26 04:14:01.222000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::StackSet  rSecurityHubConfigurationIAMRoleStackSet
+2023-04-26 04:14:00.722000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack     rSecurityHubConfigurationIAMRoleStack
+2023-04-26 04:13:56.685000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack     tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:14PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-8IYME34I9UON
+*****************************************************************************
+ResourceStatusReason:  
+Stack launch was successful
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                  LogicalResourceId                                                                                    ResourceStatusReason
+--------------------------------  ------------------  ----------------------------  ---------------------------------------------------------------------------------------------------  ---------------------------
+2023-04-26 04:13:40.972000+00:00  CREATE_COMPLETE     AWS::CloudFormation::Stack    tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-8IYME34I9UON
+2023-04-26 04:13:37.995000+00:00  CREATE_COMPLETE     Custom::LambdaCustomResource  rManagementAccountParametersLambdaCustomResource
+2023-04-26 04:13:37.753000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rManagementAccountParametersLambdaCustomResource                                                     Resource creation Initiated
+2023-04-26 04:12:24.846000+00:00  CREATE_COMPLETE     AWS::S3::BucketPolicy         rSRAStagingS3BucketPolicy
+2023-04-26 04:12:24.719000+00:00  CREATE_IN_PROGRESS  AWS::S3::BucketPolicy         rSRAStagingS3BucketPolicy                                                                            Resource creation Initiated
+2023-04-26 04:12:23.899000+00:00  CREATE_IN_PROGRESS  AWS::S3::BucketPolicy         rSRAStagingS3BucketPolicy
+2023-04-26 04:12:20.399000+00:00  CREATE_COMPLETE     Custom::LambdaCustomResource  rOrgIdLambdaCustomResource
+2023-04-26 04:12:20.132000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rOrgIdLambdaCustomResource                                                                           Resource creation Initiated
+2023-04-26 04:12:16.397000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rManagementAccountParametersLambdaCustomResource
+2023-04-26 04:12:15.778000+00:00  CREATE_IN_PROGRESS  Custom::LambdaCustomResource  rOrgIdLambdaCustomResource
+2023-04-26 04:12:13.634000+00:00  CREATE_COMPLETE     AWS::Lambda::Function         rManagementAccountParametersLambdaFunction
+2023-04-26 04:12:13.134000+00:00  CREATE_COMPLETE     AWS::Lambda::Function         rOrgIdLambdaFunction
+2023-04-26 04:12:06.368000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rManagementAccountParametersLambdaFunction                                                           Resource creation Initiated
+2023-04-26 04:12:05.850000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rOrgIdLambdaFunction                                                                                 Resource creation Initiated
+2023-04-26 04:12:05.134000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rManagementAccountParametersLambdaFunction
+2023-04-26 04:12:04.660000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rOrgIdLambdaFunction
+2023-04-26 04:12:00.917000+00:00  CREATE_COMPLETE     Custom::CopyZips              rCopyZips
+2023-04-26 04:12:00.669000+00:00  CREATE_IN_PROGRESS  Custom::CopyZips              rCopyZips                                                                                            Resource creation Initiated
+2023-04-26 04:11:53.297000+00:00  CREATE_IN_PROGRESS  Custom::CopyZips              rCopyZips
+2023-04-26 04:11:49.596000+00:00  CREATE_COMPLETE     AWS::Lambda::Function         rCopyZipsFunction
+2023-04-26 04:11:44.033000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rCopyZipsFunction                                                                                    Resource creation Initiated
+2023-04-26 04:11:42.880000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function         rCopyZipsFunction
+2023-04-26 04:11:38.374000+00:00  CREATE_COMPLETE     AWS::IAM::Role                rCopyZipsRole
+2023-04-26 04:11:23.762000+00:00  CREATE_COMPLETE     AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketName
+2023-04-26 04:11:23.086000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketName                                                                  Resource creation Initiated
+2023-04-26 04:11:22.830000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rCopyZipsRole                                                                                        Resource creation Initiated
+2023-04-26 04:11:22.467000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rCopyZipsRole
+2023-04-26 04:11:21.575000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketName
+2023-04-26 04:11:19.283000+00:00  CREATE_COMPLETE     AWS::S3::Bucket               rSRAStagingS3Bucket
+2023-04-26 04:11:13.116000+00:00  CREATE_COMPLETE     AWS::IAM::Role                rOrgIdLambdaRole
+2023-04-26 04:11:13.014000+00:00  CREATE_COMPLETE     AWS::IAM::Role                rManagementAccountParametersLambdaRole
+2023-04-26 04:10:57.551000+00:00  CREATE_IN_PROGRESS  AWS::S3::Bucket               rSRAStagingS3Bucket                                                                                  Resource creation Initiated
+2023-04-26 04:10:57.265000+00:00  CREATE_COMPLETE     AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:10:57.110000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rOrgIdLambdaRole                                                                                     Resource creation Initiated
+2023-04-26 04:10:56.997000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rManagementAccountParametersLambdaRole                                                               Resource creation Initiated
+2023-04-26 04:10:56.706000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketNamePrefix                                                            Resource creation Initiated
+2023-04-26 04:10:56.416000+00:00  CREATE_IN_PROGRESS  AWS::S3::Bucket               rSRAStagingS3Bucket
+2023-04-26 04:10:56.338000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rOrgIdLambdaRole
+2023-04-26 04:10:56.015000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role                rManagementAccountParametersLambdaRole
+2023-04-26 04:10:55.306000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter           rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:10:49.059000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack    tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-8IYME34I9UON  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:14PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [rSecurityHubConfigurationIAMRoleStack,
+rSecurityHubConfigurationIAMRoleStackSet].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                   LogicalResourceId                                                                                     ResourceStatusReason
+--------------------------------  ------------------  -----------------------------  ----------------------------------------------------------------------------------------------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2023-04-26 04:14:03.992000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack     tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV  The following resource(s) failed to create: [rSecurityHubConfigurationIAMRoleStack, rSecurityHubConfigurationIAMRoleStackSet].
+2023-04-26 04:14:03.439000+00:00  CREATE_FAILED       AWS::CloudFormation::StackSet  rSecurityHubConfigurationIAMRoleStackSet                                                              Resource handler returned message: "S3 error: The bucket you are attempting to access must be addressed using the specified endpoint. Please send all future requests to this endpoint.
+                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html (Service: CloudFormation, Status Code: 400, Request ID: 784d7941-fa06-431b-8404-3cdd588350eb)" (RequestToken: 71d1260a-bf0a-d49c-6af5-c8601323f898, HandlerErrorCode: GeneralServiceException)
+2023-04-26 04:14:02.138000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack     rSecurityHubConfigurationIAMRoleStack                                                                 S3 error: The bucket you are attempting to access must be addressed using the specified endpoint. Please send all future requests to this endpoint.
+                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+2023-04-26 04:14:01.222000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::StackSet  rSecurityHubConfigurationIAMRoleStackSet
+2023-04-26 04:14:00.722000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack     rSecurityHubConfigurationIAMRoleStack
+2023-04-26 04:13:56.685000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack     tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mul-rSecurityHubEnableInOrg-1UKDKR75HADUV  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:14PM
+-----------------------------------------------------------------------------
+

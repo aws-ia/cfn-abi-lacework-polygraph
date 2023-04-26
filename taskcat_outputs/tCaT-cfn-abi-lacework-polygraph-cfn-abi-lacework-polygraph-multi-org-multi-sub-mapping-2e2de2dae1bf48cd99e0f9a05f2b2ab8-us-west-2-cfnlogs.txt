@@ -1,0 +1,112 @@
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping-2e2de2dae1bf48cd99e0f9a05f2b2ab8
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [CfnAbiAmazonGuardDuty,
+LaceworkSetupFunction, LaceworkControlTowerCfn, CfnAbiAwsSecurityHub].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                                                                                                        ResourceStatusReason
+--------------------------------  ------------------  --------------------------  -----------------------------------------------------------------------------------------------------------------------  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2023-04-26 04:23:36.413000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping-2e2de2dae1bf48cd99e0f9a05f2b2ab8  The following resource(s) failed to create: [CfnAbiAmazonGuardDuty, LaceworkSetupFunction, LaceworkControlTowerCfn, CfnAbiAwsSecurityHub].
+2023-04-26 04:23:35.566000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  CfnAbiAwsSecurityHub                                                                                                     Embedded stack arn:aws:cloudformation:us-west-2:510534436463:stack/tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1O9N3Q8ZN8CB8/003ddca0-e3ea-11ed-97b7-0291a294cab5 was not successfully created: The following resource(s) failed to create: [rSecurityHubStageLocal].
+2023-04-26 04:23:07.586000+00:00  CREATE_FAILED       AWS::Lambda::Function       LaceworkSetupFunction                                                                                                    Secrets Manager can't find the specified secret. (Service: AWSSecretsManager; Status Code: 400; Error Code: ResourceNotFoundException; Request ID: 37e0e260-80c4-466f-a0d1-8c2d6500ddad; Proxy: null)
+2023-04-26 04:23:06.875000+00:00  CREATE_IN_PROGRESS  AWS::Lambda::Function       LaceworkSetupFunction
+2023-04-26 04:23:03.930000+00:00  CREATE_COMPLETE     AWS::IAM::Role              LaceworkSetupFunctionRole
+2023-04-26 04:22:49.951000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  LaceworkControlTowerCfn                                                                                                  S3 error: Access Denied
+                                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+2023-04-26 04:22:49.480000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  CfnAbiAmazonGuardDuty                                                                                                    S3 error: Access Denied
+                                                                                                                                                                                                           For more information check http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html
+2023-04-26 04:22:48.906000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  CfnAbiAwsSecurityHub                                                                                                     Resource creation Initiated
+2023-04-26 04:22:48.501000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  LaceworkControlTowerCfn
+2023-04-26 04:22:48.431000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              LaceworkSetupFunctionRole                                                                                                Resource creation Initiated
+2023-04-26 04:22:48.027000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  CfnAbiAmazonGuardDuty
+2023-04-26 04:22:48.010000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  CfnAbiAwsSecurityHub
+2023-04-26 04:22:47.803000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              LaceworkSetupFunctionRole
+2023-04-26 04:22:43.641000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping-2e2de2dae1bf48cd99e0f9a05f2b2ab8  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:23PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1O9N3Q8ZN8CB8
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [rSecurityHubStageLocal].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                                                                                    ResourceStatusReason
+--------------------------------  ------------------  --------------------------  ---------------------------------------------------------------------------------------------------  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2023-04-26 04:23:28.242000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1O9N3Q8ZN8CB8  The following resource(s) failed to create: [rSecurityHubStageLocal].
+2023-04-26 04:23:27.816000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  rSecurityHubStageLocal                                                                               Embedded stack arn:aws:cloudformation:us-west-2:510534436463:stack/tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB/03509ae0-e3ea-11ed-acab-062cb0137fa5 was not successfully created: The following resource(s) failed to create: [rSRAStagingS3Bucket].
+2023-04-26 04:22:54.217000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  rSecurityHubStageLocal                                                                               Resource creation Initiated
+2023-04-26 04:22:53.166000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  rSecurityHubStageLocal
+2023-04-26 04:22:48.789000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-multi-CfnAbiAwsSecurityHub-1O9N3Q8ZN8CB8  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:23PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [rSRAStagingS3Bucket].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                                                                                     ResourceStatusReason
+--------------------------------  ------------------  --------------------------  ----------------------------------------------------------------------------------------------------  ------------------------------------------------------------------
+2023-04-26 04:23:19.607000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB  The following resource(s) failed to create: [rSRAStagingS3Bucket].
+2023-04-26 04:23:18.557000+00:00  CREATE_COMPLETE     AWS::IAM::Role              rOrgIdLambdaRole
+2023-04-26 04:23:18.136000+00:00  CREATE_COMPLETE     AWS::IAM::Role              rManagementAccountParametersLambdaRole
+2023-04-26 04:23:02.690000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rOrgIdLambdaRole                                                                                      Resource creation Initiated
+2023-04-26 04:23:02.029000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rOrgIdLambdaRole
+2023-04-26 04:23:01.983000+00:00  CREATE_COMPLETE     AWS::SSM::Parameter         rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:23:01.942000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rManagementAccountParametersLambdaRole                                                                Resource creation Initiated
+2023-04-26 04:23:01.679000+00:00  CREATE_FAILED       AWS::S3::Bucket             rSRAStagingS3Bucket                                                                                   sra-sh-staging-510534436463-us-west-2 already exists
+2023-04-26 04:23:01.416000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter         rSSMParameterSRAStagingS3BucketNamePrefix                                                             Resource creation Initiated
+2023-04-26 04:23:01.196000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rManagementAccountParametersLambdaRole
+2023-04-26 04:23:00.856000+00:00  CREATE_IN_PROGRESS  AWS::S3::Bucket             rSRAStagingS3Bucket
+2023-04-26 04:23:00.401000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter         rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:22:54.021000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:23PM
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [rSRAStagingS3Bucket].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                                                                                     ResourceStatusReason
+--------------------------------  ------------------  --------------------------  ----------------------------------------------------------------------------------------------------  ------------------------------------------------------------------
+2023-04-26 04:23:19.607000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB  The following resource(s) failed to create: [rSRAStagingS3Bucket].
+2023-04-26 04:23:18.557000+00:00  CREATE_COMPLETE     AWS::IAM::Role              rOrgIdLambdaRole
+2023-04-26 04:23:18.136000+00:00  CREATE_COMPLETE     AWS::IAM::Role              rManagementAccountParametersLambdaRole
+2023-04-26 04:23:02.690000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rOrgIdLambdaRole                                                                                      Resource creation Initiated
+2023-04-26 04:23:02.029000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rOrgIdLambdaRole
+2023-04-26 04:23:01.983000+00:00  CREATE_COMPLETE     AWS::SSM::Parameter         rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:23:01.942000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rManagementAccountParametersLambdaRole                                                                Resource creation Initiated
+2023-04-26 04:23:01.679000+00:00  CREATE_FAILED       AWS::S3::Bucket             rSRAStagingS3Bucket                                                                                   sra-sh-staging-510534436463-us-west-2 already exists
+2023-04-26 04:23:01.416000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter         rSSMParameterSRAStagingS3BucketNamePrefix                                                             Resource creation Initiated
+2023-04-26 04:23:01.196000+00:00  CREATE_IN_PROGRESS  AWS::IAM::Role              rManagementAccountParametersLambdaRole
+2023-04-26 04:23:00.856000+00:00  CREATE_IN_PROGRESS  AWS::S3::Bucket             rSRAStagingS3Bucket
+2023-04-26 04:23:00.401000+00:00  CREATE_IN_PROGRESS  AWS::SSM::Parameter         rSSMParameterSRAStagingS3BucketNamePrefix
+2023-04-26 04:22:54.021000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-cfn-abi-lacework-polygraph-cfn-abi-lacework-polygraph-mult-rSecurityHubStageLocal-110EUUJY2PCGB  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 25. April 2023 09:23PM
+-----------------------------------------------------------------------------
+
