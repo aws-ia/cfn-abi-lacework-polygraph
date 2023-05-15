@@ -1,0 +1,12 @@
+[submodule "submodules/cfn-abi-aws-securityhub"]
+	path = submodules/cfn-abi-aws-securityhub
+	url = https://github.com/aws-ia/cfn-abi-aws-securityhub.git
+[submodule "submodules/lacework-control-tower-cfn"]
+	path = submodules/lacework-control-tower-cfn
+	url = https://github.com/lacework-alliances/lacework-control-tower-cfn.git
+[submodule "submodules/cfn-abi-amazon-guardduty"]
+	path = submodules/cfn-abi-amazon-guardduty
+	url = https://github.com/aws-ia/cfn-abi-amazon-guardduty.git
+[submodule "submodules/--force"]
+	path = submodules/--force
+	url = https://github.com/aws-ia/cfn-abi-amazon-guardduty.git

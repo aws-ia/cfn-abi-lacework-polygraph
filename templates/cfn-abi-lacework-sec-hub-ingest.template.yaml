@@ -1,0 +1,166 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Lacework AWS Security Hub Ingestion Integration
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Parameters:
+          - LaceworkAccount
+          - ExternalID
+          - ApiToken
+    ParameterLabels:
+      LaceworkAccount:
+        default: Lacework Account, ie. <account>.lacework.net
+      ExternalID:
+        default: ExternalID
+      ApiToken:
+        default: API Token
+
+Parameters:
+  LaceworkAccount:
+    Description: Your Lacework Account, ie. <account>.lacework.net
+    Type: String
+    Default: MyAccount
+    MinLength: "1"
+    MaxLength: "45"
+    AllowedPattern: "^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$"
+    ConstraintDescription: Invalid resource name prefix value.  Must match pattern
+      ^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$
+  ExternalID:
+    Description: The cross-account access role created by the stack will use this
+      value for its ExternalID.
+    Type: String
+    Default: "1"
+    MaxLength: "1224"
+    ConstraintDescription: Invalid ExternalID value.  Must be equal to "%extid"
+  ApiToken:
+    Description: The token required for making API requests with Lacework.
+    Type: String
+    Default: "1"
+    MinLength: "1"
+    ConstraintDescription: A valid API Token is required
+
+Resources:
+  LaceworkSecHubQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${LaceworkAccount}-Lacework-Sec-Hub-Queue"
+
+  LaceworkSecHubQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: EventsRuleAccess
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action:
+              - sqs:SendMessage
+            Resource: !GetAtt LaceworkSecHubQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn:
+                  - !GetAtt LaceworkSecHubEventsRule.Arn
+      Queues:
+        - !Ref LaceworkSecHubQueue
+
+  LaceworkSecHubCrossAccountAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${LaceworkAccount}-Lacework-Sec-Hub-Role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              AWS: ["434813966438"]
+            Condition:
+              StringEquals:
+                sts:ExternalId:
+                  !Ref ExternalID
+      Path: "/"
+      Policies:
+        - PolicyName: LaceworkSecHubCrossAccountAccessRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ListQueues
+                  - sqs:GetQueueAttributes
+                  - sqs:GetQueueUrl
+                  - sqs:DeleteMessage
+                  - sqs:ReceiveMessage
+                Resource:
+                  - !GetAtt LaceworkSecHubQueue.Arn
+
+  LaceworkSecHubEventsRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: "Captures Findings from AWS Security Hub"
+      EventBusName: "default"
+      EventPattern:
+        source: ["aws.securityhub"]
+        detail-type: ["Security Hub Findings - Imported"]
+      Name: !Sub "${LaceworkAccount}-Lacework-Sec-Hub-Events-Rule"
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt LaceworkSecHubQueue.Arn
+          Id: lacework-aws-sec-hub-to-sqs-queue
+
+  EventBridgeToToSqsPolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: SQS:SendMessage
+            Resource:  !GetAtt LaceworkSecHubQueue.Arn
+      Queues:
+        - !Ref LaceworkSecHubQueue
+
+  LaceworkSnsCustomResource:
+    Type: Custom::LaceworkSnsCustomResource
+    DependsOn:
+      - LaceworkSecHubQueuePolicy
+    Properties:
+      Type: AWS_SECURITY_HUB
+      ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:434813966438:prodn-customer-cloudformation"
+      IntegrationName:
+        !Ref AWS::StackName
+      RoleArn:
+        !GetAtt LaceworkSecHubCrossAccountAccessRole.Arn
+      ExternalId:
+        !Ref ExternalID
+      SqsQueueUrl:
+        !Ref LaceworkSecHubQueue
+      ApiToken:
+        !Ref ApiToken
+      Account:
+        !Ref LaceworkAccount
+      TemplateVersion: "0.1"
+      AWSAccountId:
+        !Ref AWS::AccountId
+Outputs:
+  RoleARN:
+    Description: Cross-account access role ARN to share with Lacework
+      integration
+    Value:
+      !GetAtt LaceworkSecHubCrossAccountAccessRole.Arn
+  ExternalID:
+    Description: ExternalID to share with Lacework
+    Value:
+      !Ref ExternalID
+  SQSQueueURL:
+    Description: SQS queue URL to share with Lacework
+    Value:
+      !Ref LaceworkSecHubQueue
+  TemplateVersion:
+    Description: Template version
+    Value: "0.1"
