@@ -1,0 +1,48 @@
+diff a/scripts/cleanup_config.json b/scripts/cleanup_config.json	(rejected hunks)
+@@ -3,3 +16,15 @@
+         "Type": "STACK",
+-        "Filter" : "replace-with-stack-name-prefix-to-be-cleaned"
++        "Filter" : "tCaT-enable-securityhub-ssm-"
++    },
++    {
++        "Type" : "STACK",
++        "Filter": "tCaT-stage-sh-content-local-"
++    },
++    {
++        "Type" : "STACK",
++        "Filter": "tCaT-enable-securityhub-in-org-ssm-"
++    },
++    {
++        "Type" : "S3_BUCKET",
++        "Filter": "tcat-cfn-abi-aws-securityhub-"
+     },
+@@ -7,3 +32,3 @@
+         "Type" : "S3_BUCKET",
+-        "Filter": "replace-with-s3-bucket-prefix-to-be-cleaned"
++        "Filter": "sra-gd-staging-"
+     },
+@@ -11,4 +36,7 @@
+         "Type" : "S3_BUCKET",
+-        "Filter": "replace-with-s3-bucket-prefix-to-be-cleaned",
+-        "Account": "provide-your-account-name"
++        "Filter" : "sra-sh-stage-"
++    },
++    {
++        "Type" : "S3_BUCKET",
++        "Filter" : "sra-sh-staging-"
+     },
+@@ -16,3 +44,3 @@
+         "Type" : "SSM_PARAMETER",
+-        "Filter" : "/path/to/parameter-prefix-to-delete"
++        "Filter" : "/sra/sh/"
+     },
+@@ -19,4 +47,4 @@
+     {
+-        "Type" : "LOG_GROUP",
+-        "Filter" : "path/to/log-group-prefix-to-delete"
++        "Type" : "S3_BUCKET",
++        "Filter" : "cfn-abi-lacework-polygraph"
+     }
+@@ -23 +51,2 @@
+ ]
++
