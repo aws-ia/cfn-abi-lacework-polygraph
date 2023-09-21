@@ -6,7 +6,7 @@ project:
   regions:
   - us-east-1
 tests:
-  cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping:
+  cfn-abi-lacework-polygraph-org-multi-sub-mapping:
     regions:
       - us-east-1 # Control Tower Home region for Pilot
     template: templates/cfn-abi-lacework-polygraph.template.yaml
