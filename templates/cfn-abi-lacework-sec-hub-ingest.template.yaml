@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Lacework AWS Security Hub Ingestion Integration
+Description: "Lacework AWS Security Hub Ingestion Integration. (abi-1kirFQBF75MfEQ3RbMQHRb-1uUqxTu50BQyeDu1QxxGqM-ln89350v)"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

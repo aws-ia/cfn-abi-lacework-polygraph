@@ -7,7 +7,7 @@ PROJECT_TYPE_PATH=${BASE_PATH}/projecttype
 
 cd ${PROJECT_PATH}
 
-taskcat upload --bucket-name aws-abi-pilot --object-acl public-read
+taskcat upload --bucket-name aws-abi --object-acl public-read
 
 # if [ -n "${BASE_PATH}" ]
 # then
