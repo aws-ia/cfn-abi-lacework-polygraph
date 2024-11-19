@@ -65,12 +65,7 @@
     },
     {
         "Type" : "SSM_PARAMETER",
-        "Filter" : "/sra/"
-    },
-    {
-        "Type" : "S3_BUCKET",
-        "Filter" : "sra-guardduty-org-delivery-",
-        "Account" : "log_account"
+        "Filter" : "/sra/staging-s3-bucket-name"
     },
     {
         "Type" : "S3_BUCKET",
@@ -88,11 +83,6 @@
         "Type" : "S3_BUCKET",
         "Filter": "sra-org-trail-logs-",
         "Account": "log_account"
-    },
-    {
-        "Type" : "S3_BUCKET",
-        "Filter" : "sra-guardduty-org-delivery-",
-        "Account" : "log_account"
     },
     {
         "Type" : "S3_BUCKET",
@@ -173,6 +163,18 @@
     {
         "Type" : "STACK_SET",
         "Filter" : "sra-stackset-execution-role"
+    },
+    {
+        "Type" : "STACK_SET",
+        "Filter" : "sra-staging-s3-bucket-management-account-regions"
+    },
+    {
+        "Type" : "STACK_SET",
+        "Filter" : "sra-guardduty-org-delivery-s3-bucket"
+    },
+    {
+        "Type" : "STACK_SET",
+        "Filter" : "sra-guardduty-org-delivery-kms-key"
     },
     {
         "Type" : "STACK",

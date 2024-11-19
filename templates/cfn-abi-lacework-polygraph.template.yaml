@@ -60,11 +60,20 @@ Metadata:
           - pLambdaLogGroupRetention
           - pLambdaLogGroupKmsKey
           - pLambdaLogLevel
-
       - Label:
           default: EventBridge Rule Properties
         Parameters:
           - pComplianceFrequency
+      - Label:
+          default: Advanced Configuration Properties
+        Parameters:
+          - pControlTower
+          - pGovernedRegions
+          - pSecurityAccountId
+          - pLogArchiveAccountId
+          - pCreateAWSControlTowerExecutionRole
+          - pAdminRoleName
+          - pExecRoleName
 
     ParameterLabels:
       # General Properties
@@ -147,6 +156,15 @@ Metadata:
       # EventBridge Rule Properties
       pComplianceFrequency:
         default: Frequency to Check for Organizational Compliance
+      # Advanced Configuration Properties
+      pControlTower:
+        default: pControlTower
+      pGovernedRegions:
+        default: pGovernedRegions
+      pSecurityAccountId:
+        default: pSecurityAccountId
+      pLogArchiveAccountId:
+        default: pLogArchiveAccountId
 Parameters:
   # General Properties
   pSRASourceS3BucketName:
@@ -226,7 +244,7 @@ Parameters:
     MinLength: '1'
     AllowedPattern: '^[-a-zA-Z0-9_]*$'
     ConstraintDescription: "Invalid CloudTrail name."
-    Description: "Enter your existing AWS Control Tower CloudTrail name."
+    Description: "Enter your existing AWS CloudTrail trail name if not using AWS Control Tower."
     Default: 'aws-controltower-BaselineCloudTrail'
   LogAccountName:
     Type: String
@@ -360,6 +378,49 @@ Parameters:
     MinValue: 1
     MaxValue: 30
     Type: Number
+  # Advanced Configuration Properties
+  pControlTower:
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description:
+      Indicates whether AWS Control Tower is deployed and being used for this AWS environment.
+    Type: String
+  pSecurityAccountId:
+    AllowedPattern: '^\d{12}$'
+    Default: 111111111111
+    ConstraintDescription: Must be 12 digits.
+    Description: AWS Account ID of the Security Tooling account (ignored for AWS Control Tower environments).
+    Type: String
+  pLogArchiveAccountId:
+    AllowedPattern: '^\d{12}$'
+    Default: 222222222222
+    ConstraintDescription: Must be 12 digits.
+    Description: AWS Account ID of the Log Archive account (ignored for AWS Control Tower environments).
+    Type: String
+  pGovernedRegions:
+    AllowedPattern: '^(ct-regions)|((\b(?<!@)(af-south-1|ap-east-1|ap-northeast-1|ap-northeast-2|ap-northeast-3|ap-south-1|ap-south-2|ap-southeast-1|ap-southeast-2|ap-southeast-3|ap-southeast-4|ca-central-1|cn-north-1|cn-northwest-1|eu-central-1|eu-central-2|eu-north-1|eu-south-1|eu-south-2|eu-west-1|eu-west-2|eu-west-3|me-central-1|me-south-1|sa-east-1|us-east-1|us-east-2|us-gov-east-1|us-gov-west-1|us-west-1|us-west-2)\b,{0,1})*)$'
+    ConstraintDescription:
+      For AWS Control Tower, set to ct-regions (default).  If not using AWS Control Tower, specify comma separated list of regions (e.g. us-west-2,us-east-1,ap-south-1) in lower case.
+    Default: ct-regions
+    Description: AWS regions (comma separated) if not using AWS Control Tower (leave set to ct-regions for AWS Control Tower environments)
+    Type: String
+  pCreateAWSControlTowerExecutionRole:
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description: Indicates whether the AWSControlTowerExecution role should be created in the management account. (Only when AWS Control Tower landing zone is deployed. The 'pControlTower' must be set to 'true')
+    Type: String
+  pAdminRoleName:
+    Default: 'AWSCloudFormationStackSetAdministrationRole'
+    Description: IAM role in the Management account, used to deploy stacks in other account/regions. Needed only when 'pControlTower' is set to 'false'
+    Type: String
+  pExecRoleName:
+    Default: 'AWSCloudFormationStackSetExecutionRole'
+    Description: IAM role in the AWS accounts, which allows trusted access to 'pAdminRoleName'. Needed only when 'pControlTower' is set to 'false'
+    Type: String
+  
+Conditions:
+  cControlTowerEnabled: !Equals [!Ref pControlTower, 'true']
+
 Resources:
   rOrgIdGdLambdaCustomResource:
     Type: Custom::LambdaCustomResource
@@ -570,7 +631,7 @@ Resources:
       SourceBucket: !Ref 'pSRASourceS3BucketName'
       Prefix: !Sub '${pSRAStagingS3KeyPrefix}/'
       Objects:
-        - submodules/lacework-control-tower-cfn/lambda_functions/packages/setup/LaceworkCTSetup3.2.0.zip
+        - submodules/lacework-control-tower-cfn/lambda_functions/packages/setup/LaceworkCTSetup3.3.0.zip
         - submodules/lacework-control-tower-cfn/lambda_functions/packages/account/LaceworkCTAccount3.2.0.zip
         - submodules/lacework-control-tower-cfn/lambda_functions/packages/auth/LaceworkCTAuth3.2.0.zip
         - submodules/lacework-control-tower-cfn/templates/cfn-abi-control-tower-integration.template.yaml
@@ -679,9 +740,12 @@ Resources:
               finally:
                   timer.cancel()
                   cfnresponse.send(event, context, status, {}, None)
+
   LaceworkControlTowerCfn:
     Type: AWS::CloudFormation::Stack
-    DependsOn: CopyZips
+    DependsOn: 
+      - CopyZips
+      - CfnAbiAwsSecurityHub
     Properties:
       TemplateURL: !Sub "https://${pSRASourceS3BucketName}.s3.${pSRAS3BucketRegion}.${AWS::URLSuffix}/${pSRAStagingS3KeyPrefix}/submodules/lacework-control-tower-cfn/templates/cfn-abi-control-tower-integration.template.yaml"
       Parameters:
@@ -698,6 +762,17 @@ Resources:
         LogAccountName: !Ref LogAccountName
         AuditAccountName: !Ref AuditAccountName
         KMSKeyIdentifierARN: !Ref KMSKeyIdentifierARN
+        AdministrationRoleARN: 
+          !If
+            - cControlTowerEnabled
+            - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/service-role/AWSControlTowerStackSetRole
+            - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${pAdminRoleName} 
+        ExecutionRoleName: 
+          !If
+            - cControlTowerEnabled
+            - AWSControlTowerExecution
+            - !Ref pExecRoleName
+
   CfnAbiAwsSecurityHub:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -717,6 +792,11 @@ Resources:
         pLambdaLogLevel: !Ref pLambdaLogLevel
         pRegionLinkingMode: !Ref pRegionLinkingMode
         pSRAAlarmEmail: !Ref pSRAAlarmEmail
+        pCreateAWSControlTowerExecutionRole: !Ref pCreateAWSControlTowerExecutionRole
+        pControlTower: !Ref pControlTower
+        pGovernedRegions: !Ref pGovernedRegions
+        pSecurityAccountId: !Ref pSecurityAccountId
+        pLogArchiveAccountId: !Ref pLogArchiveAccountId
       Tags:
         - Key: sra-solution
           Value: !Ref pSRAStagingS3KeyPrefix
@@ -739,6 +819,10 @@ Resources:
         pEnableLambdaNetworkLogs: !Ref pEnableLambdaNetworkLogs
         pGuardDutyFindingPublishingFrequency: !Ref pGuardDutyFindingPublishingFrequency
         pSRAAlarmEmail: !Ref pSRAAlarmEmail
+        pControlTower: !Ref pControlTower
+        pGovernedRegions: !Ref pGovernedRegions
+        pSecurityAccountId: !Ref pSecurityAccountId
+        pLogArchiveAccountId: !Ref pLogArchiveAccountId
       Tags:
         - Key: sra-solution
           Value: !Ref pSRAStagingS3KeyPrefix
