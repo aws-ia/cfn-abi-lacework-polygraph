@@ -8,57 +8,92 @@ project:
 tests:
   cfn-abi-lacework-polygraph-multi-org-multi-sub-mapping:
     regions:
-      - us-east-1 # Control Tower Home region for Pilot
+      - us-east-1 
     template: templates/cfn-abi-lacework-polygraph.template.yaml
     parameters:
       pSRAStagingS3KeyPrefix: $[taskcat_project_name]
       pSRASourceS3BucketName: $[taskcat_autobucket]
       pSRAS3BucketRegion: $[taskcat_current_region]
-      LaceworkURL: laceworkalliances.lacework.net
+      LaceworkAccountName: $[taskcat_ssm_/lacework/LaceworkAccountName]
       LaceworkAccessKeyID: $[taskcat_ssm_/lacework/LaceworkAccessKeyID]
       LaceworkSecretKey: $[taskcat_ssm_/lacework/LaceworkSecretKey]
-      pCreateAWSControlTowerExecutionRole: 'true'
-  cfn-abi-lacework-polygraph-multi-org-sra-enabled:
+      KMSKeyIdentifierARN: $[taskcat_ssm_/lacework/CloudTrailKMSARN]
+      pConfigureGuardDuty: 'Yes'
+      pDisableGuardDuty: 'Yes'
+      pConfigureSecurityHub: 'Yes'
+      pDisableSecurityHub: 'Yes'
+  cfn-abi-lacework-polygraph-non-controltower:
     regions:
-      - us-east-1 # Control Tower Home region for Pilot
+      - us-east-1
     template: templates/cfn-abi-lacework-polygraph.template.yaml
     parameters:
       pSRAStagingS3KeyPrefix: $[taskcat_project_name]
       pSRASourceS3BucketName: $[taskcat_autobucket]
       pSRAS3BucketRegion: $[taskcat_current_region]
-      LaceworkURL: laceworkalliances.lacework.net
+      LaceworkAccountName: $[taskcat_ssm_/lacework/LaceworkAccountName]
+      LaceworkAccessKeyID: $[taskcat_ssm_/lacework/LaceworkAccessKeyID]
+      LaceworkSecretKey: $[taskcat_ssm_/lacework/LaceworkSecretKey]
+      pConfigureGuardDuty: 'Yes'
+      pDisableGuardDuty: 'Yes'
+      pConfigureSecurityHub: 'Yes'
+      pDisableSecurityHub: 'Yes'
+      pCreateAWSControlTowerExecutionRole: 'false'
+      pCreateSRAOrgTrail: 'Yes'
+      pControlTower: 'false'
+      pLogArchiveAccountId: $[taskcat_ssm_/nonct/log-archive-account-id]
+      pSecurityAccountId: $[taskcat_ssm_/nonct/audit-account-id]
+      pGovernedRegions: 'us-east-1'
+  cfn-abi-lacework-polygraph-multi-org-sra-enabled:
+    regions:
+      - us-east-1
+    template: templates/cfn-abi-lacework-polygraph.template.yaml
+    parameters:
+      pSRAStagingS3KeyPrefix: $[taskcat_project_name]
+      pSRASourceS3BucketName: $[taskcat_autobucket]
+      pSRAS3BucketRegion: $[taskcat_current_region]
+      LaceworkAccountName: $[taskcat_ssm_/lacework/LaceworkAccountName]
       LaceworkAccessKeyID: $[taskcat_ssm_/lacework/LaceworkAccessKeyID]
       LaceworkSecretKey: $[taskcat_ssm_/lacework/LaceworkSecretKey]
       pDisableGuardDuty: 'Yes'
       pCreateAWSControlTowerExecutionRole: 'true'
       pConfigureGuardDuty: 'Yes'
+      pDisableGuardDuty: 'Yes'
       pConfigureSecurityHub: 'Yes'
       pDisableSecurityHub: 'Yes'
   cfn-abi-lacework-polygraph-multi-org-sra-gdonly:
     regions:
-      - us-east-1 # Control Tower Home region for Pilot
+      - us-east-1
     template: templates/cfn-abi-lacework-polygraph.template.yaml
     parameters:
       pSRAStagingS3KeyPrefix: $[taskcat_project_name]
       pSRASourceS3BucketName: $[taskcat_autobucket]
       pSRAS3BucketRegion: $[taskcat_current_region]
-      LaceworkURL: laceworkalliances.lacework.net
+      LaceworkAccountName: $[taskcat_ssm_/lacework/LaceworkAccountName]
       LaceworkAccessKeyID: $[taskcat_ssm_/lacework/LaceworkAccessKeyID]
       LaceworkSecretKey: $[taskcat_ssm_/lacework/LaceworkSecretKey]
       pDisableGuardDuty: 'Yes'
+      pControlTower: 'false'
+      pLogArchiveAccountId: $[taskcat_ssm_/nonct/log-archive-account-id]
+      pSecurityAccountId: $[taskcat_ssm_/nonct/audit-account-id]
+      pGovernedRegions: 'us-east-1'
+      LaceworkAccount: $[taskcat_ssm_/lacework/LaceworkAccount]
+      OrganizationID: $[taskcat_ssm_/lacework/OrganizationID]
+      OrganizationalUnit: $[taskcat_ssm_/lacework/OrgOrganizationalUnitanizationID]
+      ExistingCloudTrail: $[taskcat_ssm_/lacework/ExistingCloudTrail]
+      KMSKeyIdentifierARN: $[taskcat_ssm_/lacework/CloudTrailKMSARN]
       pCreateAWSControlTowerExecutionRole: 'true'
       pConfigureGuardDuty: 'Yes'
       pConfigureSecurityHub: 'No'
       pDisableSecurityHub: 'No'
   cfn-abi-lacework-polygraph-multi-org-sra-shonly:
     regions:
-      - us-east-1 # Control Tower Home region for Pilot
+      - us-east-1
     template: templates/cfn-abi-lacework-polygraph.template.yaml
     parameters:
       pSRAStagingS3KeyPrefix: $[taskcat_project_name]
       pSRASourceS3BucketName: $[taskcat_autobucket]
       pSRAS3BucketRegion: $[taskcat_current_region]
-      LaceworkURL: laceworkalliances.lacework.net
+      LaceworkAccountName: $[taskcat_ssm_/lacework/LaceworkAccountName]
       LaceworkAccessKeyID: $[taskcat_ssm_/lacework/LaceworkAccessKeyID]
       LaceworkSecretKey: $[taskcat_ssm_/lacework/LaceworkSecretKey]
       pDisableGuardDuty: 'No'
@@ -66,3 +101,20 @@ tests:
       pConfigureGuardDuty: 'No'
       pConfigureSecurityHub: 'Yes'
       pDisableSecurityHub: 'Yes'
+  cfn-abi-lacework-polygraph-multi-org-sra-cloudtrailonly:
+    regions:
+      - us-east-1
+    template: templates/cfn-abi-lacework-polygraph.template.yaml
+    parameters:
+      pSRAStagingS3KeyPrefix: $[taskcat_project_name]
+      pSRASourceS3BucketName: $[taskcat_autobucket]
+      pSRAS3BucketRegion: $[taskcat_current_region]
+      LaceworkAccountName: $[taskcat_ssm_/lacework/LaceworkAccountName]
+      LaceworkAccessKeyID: $[taskcat_ssm_/lacework/LaceworkAccessKeyID]
+      LaceworkSecretKey: $[taskcat_ssm_/lacework/LaceworkSecretKey]
+      pDisableGuardDuty: 'No'
+      pCreateAWSControlTowerExecutionRole: 'true'
+      pConfigureGuardDuty: 'No'
+      pConfigureSecurityHub: 'No'
+      pCreateSRAOrgTrail: 'Yes'
+

@@ -15,7 +15,7 @@ Metadata:
       - Label:
           default: "Lacework Configuration Properties"
         Parameters:
-          - LaceworkURL
+          - LaceworkAccountName
           - LaceworkAccessKeyID
           - LaceworkSecretKey
           - CapabilityType
@@ -67,9 +67,23 @@ Metadata:
         Parameters:
           - pComplianceFrequency
       - Label:
+          default: Advanced Configuration Properties
+        Parameters:
+          - pControlTower
+          - pGovernedRegions
+          - pSecurityAccountId
+          - pLogArchiveAccountId
+          - pAdminRoleName
+          - pExecRoleName
+      - Label:
           default: Landing Zone
         Parameters:
           - pCreateAWSControlTowerExecutionRole
+      - Label:
+          default: Create Organization CloudTrail
+        Parameters:
+          - pCreateSRAOrgTrail
+
 
     ParameterLabels:
       # General Properties
@@ -86,8 +100,8 @@ Metadata:
       pRepoBranch:
         default: A tag version to use with in the SRA repository
       # Lacework Configuration Properties
-      LaceworkURL:
-        default: Your Lacework URL
+      LaceworkAccountName:
+        default: Lacework Account Name
       LaceworkOrgSubAccountNames:
         default: AWS Organizations to Lacework Sub-Account Names
       LaceworkSubAccountName:
@@ -156,9 +170,25 @@ Metadata:
       # EventBridge Rule Properties
       pComplianceFrequency:
         default: Frequency to Check for Organizational Compliance
+
+      # Advanced Configuration Properties
+      pControlTower:
+        default: pControlTower
+      pGovernedRegions:
+        default: pGovernedRegions
+      pSecurityAccountId:
+        default: pSecurityAccountId
+      pLogArchiveAccountId:
+        default: pLogArchiveAccountId
+
       # Landing Zone
       pCreateAWSControlTowerExecutionRole:
         default: AWS Control Tower Execution Role creation parameter
+      
+      # Create Organization CloudTrail
+      pCreateSRAOrgTrail:
+        default: Create Default Organization CloudTrail
+
 Parameters:
   # General Properties
   pSRASourceS3BucketName:
@@ -188,12 +218,16 @@ Parameters:
     Description: SRA version to tag
     Type: String
   # lacework parameters
-  LaceworkURL:
+  LaceworkAccountName:
+    Description: >-
+      The Lacework account name. (do not include the .lacework.net suffix)
     Type: String
-    Description: "Enter your Lacework URL. ie. account.lacework.net."
     MinLength: '1'
-    AllowedPattern: '(.+?)\.lacework\.net'
-    ConstraintDescription: "Invalid Lacework URL."
+    MaxLength: '45'
+    AllowedPattern: '^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$'
+    ConstraintDescription: >-
+      Invalid Lacework account name value.  Must match pattern
+      ^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$
   LaceworkOrgSubAccountNames:
     Type: String
     Description: "Use for AWS organizations to Lacework sub-accounts mapping. Provide a commas-separated list. Leave blank otherwise. If used, ensure that the Lacework credentials are for the Organization Admin."
@@ -223,6 +257,7 @@ Parameters:
     AllowedValues:
       - 'CloudTrail+Config'
       - 'Config'
+      - 'CloudTrail'
     Type: String
     Default: CloudTrail+Config
     Description: "Enter the Lacework Control Tower StackSet type to use."
@@ -238,7 +273,7 @@ Parameters:
     MinLength: '1'
     AllowedPattern: '^[-a-zA-Z0-9_]*$'
     ConstraintDescription: "Invalid CloudTrail name."
-    Description: "Enter your existing AWS Control Tower CloudTrail name."
+    Description: "Enter your existing AWS CloudTrail trail name if not using AWS Control Tower."
     Default: 'aws-controltower-BaselineCloudTrail'
   LogAccountName:
     Type: String
@@ -382,16 +417,61 @@ Parameters:
     MinValue: 1
     MaxValue: 30
     Type: Number
-  # Landing Zone
+
+  # Advanced Configuration Properties
+  pControlTower:
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description:
+      Indicates whether AWS Control Tower is deployed and being used for this AWS environment.
+    Type: String
+  pSecurityAccountId:
+    AllowedPattern: '^\d{12}$'
+    Default: 905418259414
+    ConstraintDescription: Must be 12 digits.
+    Description: AWS Account ID of the Security Tooling account (ignored for AWS Control Tower environments).
+    Type: String
+  pLogArchiveAccountId:
+    AllowedPattern: '^\d{12}$'
+    Default: 381492018695
+    ConstraintDescription: Must be 12 digits.
+    Description: AWS Account ID of the Log Archive account (ignored for AWS Control Tower environments).
+    Type: String
+  pGovernedRegions:
+    AllowedPattern: '^(ct-regions)|((\b(?<!@)(af-south-1|ap-east-1|ap-northeast-1|ap-northeast-2|ap-northeast-3|ap-south-1|ap-south-2|ap-southeast-1|ap-southeast-2|ap-southeast-3|ap-southeast-4|ca-central-1|cn-north-1|cn-northwest-1|eu-central-1|eu-central-2|eu-north-1|eu-south-1|eu-south-2|eu-west-1|eu-west-2|eu-west-3|me-central-1|me-south-1|sa-east-1|us-east-1|us-east-2|us-gov-east-1|us-gov-west-1|us-west-1|us-west-2)\b,{0,1})*)$'
+    ConstraintDescription:
+      For AWS Control Tower, set to ct-regions (default).  If not using AWS Control Tower, specify comma separated list of regions (e.g. us-west-2,us-east-1,ap-south-1) in lower case.
+    Default: ct-regions
+    Description: AWS regions (comma separated) if not using AWS Control Tower (leave set to ct-regions for AWS Control Tower environments)
+    Type: String
   pCreateAWSControlTowerExecutionRole:
     AllowedValues: ['true', 'false']
     Default: 'true'
-    Description: Indicates whether the AWS Control Tower Execution role should be created in the Management Account.
+    Description: Indicates whether the AWSControlTowerExecution role should be created in the management account. (Only when AWS Control Tower landing zone is deployed. The 'pControlTower' must be set to 'true')
     Type: String
-
+  pAdminRoleName:
+    Default: 'AWSCloudFormationStackSetAdministrationRole'
+    Description: IAM role in the Management account, used to deploy stacks in other account/regions. Needed only when 'pControlTower' is set to 'false'
+    Type: String
+  pExecRoleName:
+    Default: 'AWSCloudFormationStackSetExecutionRole'
+    Description: IAM role in the AWS accounts, which allows trusted access to 'pAdminRoleName'. Needed only when 'pControlTower' is set to 'false'
+    Type: String
+  
+  # Create Organization CloudTrail
+  pCreateSRAOrgTrail:
+    Type: String
+    Description: Create org-wide trail, bucket, and bucket policy to enable EventBridge event collection.  If you already have either an Organization CloudTrail or CloudTrails enabled in each account, please leave this parameter false.
+    AllowedValues:
+      - 'Yes'
+      - 'No'
+    Default: 'No'
+  
 Conditions:
+  cControlTowerEnabled: !Equals [!Ref pControlTower, 'true']
   cEnableGuardDuty: !Equals [!Ref pConfigureGuardDuty, 'Yes']
   cEnableSecurityHub: !Equals [!Ref pConfigureSecurityHub, 'Yes']
+  cEnableOrgTrail: !Equals [!Ref pCreateSRAOrgTrail, 'Yes']
 
 Resources:
   rOrgIdGdLambdaCustomResource:
@@ -603,9 +683,9 @@ Resources:
       SourceBucket: !Ref 'pSRASourceS3BucketName'
       Prefix: !Sub '${pSRAStagingS3KeyPrefix}/'
       Objects:
-        - submodules/lacework-control-tower-cfn/lambda_functions/packages/setup/LaceworkCTSetup3.2.0.zip
-        - submodules/lacework-control-tower-cfn/lambda_functions/packages/account/LaceworkCTAccount3.2.0.zip
-        - submodules/lacework-control-tower-cfn/lambda_functions/packages/auth/LaceworkCTAuth3.2.0.zip
+        - submodules/lacework-control-tower-cfn/lambda_functions/packages/setup/LaceworkCTSetup3.3.0.zip
+        - submodules/lacework-control-tower-cfn/lambda_functions/packages/account/LaceworkCTAccount3.3.0.zip
+        - submodules/lacework-control-tower-cfn/lambda_functions/packages/auth/LaceworkCTAuth3.3.0.zip
         - submodules/lacework-control-tower-cfn/templates/cfn-abi-control-tower-integration.template.yaml
         - submodules/lacework-control-tower-cfn/templates/control-tower-integration.template.yaml
         - submodules/lacework-control-tower-cfn/templates/lacework-aws-cfg-member.template.yaml
@@ -635,7 +715,7 @@ Resources:
                   - s3:GetObject
                   - s3:GetObjectTagging
                 Resource:
-                  - !Sub 'arn:${AWS::Partition}:s3:::${pSRASourceS3BucketName}/'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pSRASourceS3BucketName}/*'
                   - !Sub 'arn:${AWS::Partition}:s3:::${pSRASourceS3BucketName}/${pSRAStagingS3KeyPrefix}/*'
               - Effect: Allow
                 Action:
@@ -643,8 +723,14 @@ Resources:
                   - s3:DeleteObject
                   - s3:PutObjectTagging
                 Resource:
-                  - !Sub 'arn:${AWS::Partition}:s3:::${rStagingS3Bucket}/'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${rStagingS3Bucket}/*'
                   - !Sub 'arn:${AWS::Partition}:s3:::${rStagingS3Bucket}/${pSRAStagingS3KeyPrefix}/*'
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pSRASourceS3BucketName}'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${rStagingS3Bucket}'
 
   CopyZipsFunction:
     Type: AWS::Lambda::Function
@@ -712,25 +798,64 @@ Resources:
               finally:
                   timer.cancel()
                   cfnresponse.send(event, context, status, {}, None)
+
+  # Optional Default Organization CloudTrail
+  CloudTrailStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Condition: cEnableOrgTrail
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: !Sub "https://${pSRASourceS3BucketName}.s3.${pSRAS3BucketRegion}.${AWS::URLSuffix}/${pSRAStagingS3KeyPrefix}/submodules/aws-security-reference-architecture-examples/aws_sra_examples/modules/cloudtrail-org-module/templates/sra-cloudtrail-org-module-main.yaml"
+      Parameters:
+        pRepoURL: !Ref pRepoURL
+        pRepoBranch: !Ref pRepoBranch
+        pEnableDataEventsOnly: false
+        pControlTower: !Ref pControlTower
+        pGovernedRegions: !Ref pGovernedRegions
+        pSecurityAccountId: !Ref pSecurityAccountId
+        pLogArchiveAccountId: !Ref pLogArchiveAccountId
+        pCreateAWSControlTowerExecutionRole: !Ref pCreateAWSControlTowerExecutionRole
+  
   LaceworkControlTowerCfn:
     Type: AWS::CloudFormation::Stack
-    DependsOn: CopyZips
+    DependsOn: 
+      - CopyZips
     Properties:
       TemplateURL: !Sub "https://${pSRASourceS3BucketName}.s3.${pSRAS3BucketRegion}.${AWS::URLSuffix}/${pSRAStagingS3KeyPrefix}/submodules/lacework-control-tower-cfn/templates/cfn-abi-control-tower-integration.template.yaml"
       Parameters:
         S3BucketName: !Ref rStagingS3Bucket
         S3KeyPrefix: !Ref pSRAStagingS3KeyPrefix
-        LaceworkURL: !Ref LaceworkURL
+        LaceworkAccountName: !Ref LaceworkAccountName
         LaceworkOrgSubAccountNames: !Ref LaceworkOrgSubAccountNames
         LaceworkSubAccountName: !Ref LaceworkSubAccountName
         LaceworkAccessKeyID: !Ref LaceworkAccessKeyID
         LaceworkSecretKey: !Ref LaceworkSecretKey
         CapabilityType: !Ref CapabilityType
         ExistingAccounts: !Ref ExistingAccounts
-        ExistingCloudTrail: !Ref ExistingCloudTrail
+        ExistingCloudTrail:
+          !If
+            - cEnableOrgTrail
+            - !Select
+              - 0
+              - !Split
+                - "-logs-"
+                - !GetAtt CloudTrailStack.Outputs.oOrganizationCloudTrailS3BucketName
+            - !Ref ExistingCloudTrail
         LogAccountName: !Ref LogAccountName
         AuditAccountName: !Ref AuditAccountName
         KMSKeyIdentifierARN: !Ref KMSKeyIdentifierARN
+        AdministrationRoleARN: 
+          !If
+            - cControlTowerEnabled
+            - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/service-role/AWSControlTowerStackSetRole
+            - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${pAdminRoleName} 
+        ExecutionRoleName: 
+          !If
+            - cControlTowerEnabled
+            - AWSControlTowerExecution
+            - !Ref pExecRoleName
+
   CfnAbiAwsSecurityHub:
     Type: AWS::CloudFormation::Stack
     Condition: cEnableSecurityHub
@@ -754,9 +879,14 @@ Resources:
         pRegionLinkingMode: !Ref pRegionLinkingMode
         pSRAAlarmEmail: !Ref pSRAAlarmEmail
         pCreateAWSControlTowerExecutionRole: !Ref pCreateAWSControlTowerExecutionRole
+        pControlTower: !Ref pControlTower
+        pGovernedRegions: !Ref pGovernedRegions
+        pSecurityAccountId: !Ref pSecurityAccountId
+        pLogArchiveAccountId: !Ref pLogArchiveAccountId
       Tags:
         - Key: sra-solution
           Value: !Ref pSRAStagingS3KeyPrefix
+  
   CfnAbiAmazonGuardDuty:
     Type: AWS::CloudFormation::Stack
     Condition: cEnableGuardDuty
@@ -780,10 +910,15 @@ Resources:
         pEnableLambdaNetworkLogs: !Ref pEnableLambdaNetworkLogs
         pGuardDutyFindingPublishingFrequency: !Ref pGuardDutyFindingPublishingFrequency
         pSRAAlarmEmail: !Ref pSRAAlarmEmail
+        pControlTower: !Ref pControlTower
+        pGovernedRegions: !Ref pGovernedRegions
+        pSecurityAccountId: !Ref pSecurityAccountId
+        pLogArchiveAccountId: !Ref pLogArchiveAccountId
         pCreateAWSControlTowerExecutionRole: !Ref pCreateAWSControlTowerExecutionRole
       Tags:
         - Key: sra-solution
           Value: !Ref pSRAStagingS3KeyPrefix
+  
   LaceworkSecurityHubCfn:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -791,6 +926,6 @@ Resources:
     Properties:
       TemplateURL: !Sub "https://${pSRASourceS3BucketName}.s3.${pSRAS3BucketRegion}.${AWS::URLSuffix}/${pSRAStagingS3KeyPrefix}/templates/cfn-abi-lacework-sec-hub-ingest.template.yaml"
       Parameters:
-        LaceworkAccount: !Select [ 0, !Split [ '.', !Ref LaceworkURL ] ]
+        LaceworkAccount: !Ref LaceworkAccountName
         ExternalID: !Select [ 4, !Split [ '-', !Select [ 2, !Split [ '/', !Ref AWS::StackId ] ] ] ]
         ApiToken: "{{resolve:secretsmanager:LaceworkApiCredentials:SecretString:AccessToken}}"
